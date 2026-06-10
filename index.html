@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SEKARSA - Sistem E-Arsip Kepegawaian Resmi SMPN 156 Jakarta.">
+    <link rel="icon" type="image/png" href="logo.png">
+    <title>SEKARSA - E-Arsip Kepegawaian SMPN 156 Jakarta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <div id="custom-dialog" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 max-w-sm w-full p-6 text-center transform scale-95 transition-transform duration-300">
+            <div id="dialog-icon-container" class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl">
+                <i id="dialog-icon" class="fa-solid"></i>
+            </div>
+            <h3 id="dialog-title" class="text-lg font-bold text-slate-900"></h3>
+            <p id="dialog-message" class="text-sm text-slate-500 mt-2"></p>
+        </div>
+    </div>
+
+    <header id="main-header" class="bg-white shadow-sm border-b border-slate-200 hidden sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="logo.png" alt="Logo" class="h-10 w-10 object-contain" onerror="this.src='https://via.placeholder.com/40'">
+                <div>
+                    <h1 class="text-lg font-bold text-slate-900 tracking-tight">SEKARSA</h1>
+                    <p class="text-xs text-slate-500">SMPN 156 Jakarta</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 text-right hidden sm:block">
+                    <p id="nav-nama-user" class="text-sm font-semibold text-slate-700">-</p>
+                    <p id="nav-role-user" class="text-xs text-slate-400 capitalize">-</p>
+                </div>
+                <img id="nav-profile-img" src="https://via.placeholder.com/40" alt="Avatar" class="h-10 w-10 rounded-full object-cover border border-slate-200">
+                <button onclick="logoutKonfirmasi()" class="text-slate-400 hover:text-rose-600 transition-colors p-2" title="Keluar"><i class="fa-solid fa-right-from-bracket text-xl"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div id="page-login" class="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 w-full max-w-md transition-all">
+            <div class="text-center mb-6">
+                <img src="logo.png" alt="Logo" class="h-20 w-20 mx-auto mb-3" onerror="this.src='https://via.placeholder.com/80'">
+                <h2 class="text-2xl font-bold text-slate-900">Selamat Datang</h2>
+                <p class="text-sm text-slate-500 mt-1">E-Arsip Kepegawaian SMPN 156 Jakarta</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1 uppercase tracking-wider">Username / NIP</label>
+                    <input type="text" id="login-username" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan username">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1 uppercase tracking-wider">Password</label>
+                    <input type="password" id="login-password" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                </div>
+                <button id="btn-login" onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl shadow-lg transition-all mt-2">Masuk Ke Sistem</button>
+                <div class="text-center mt-3">
+                    <button onclick="lupaPassword()" class="text-xs text-blue-500 hover:underline">Lupa Password Anda?</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="dashboard-container" class="w-full max-w-7xl mx-auto hidden transition-all">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+                
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center text-center">
+                    <div class="relative group">
+                        <img id="profile-img" src="https://via.placeholder.com/150" alt="Profil" class="h-32 w-32 rounded-full object-cover border-4 border-slate-100 shadow-sm">
+                        <label class="absolute bottom-1 right-1 bg-blue-600 text-white p-2 rounded-full cursor-pointer shadow hover:bg-blue-700 transition-all text-xs" title="Ganti Foto Profil">
+                            <i class="fa fa-camera"></i>
+                            <input type="file" id="input-foto-profil" class="hidden" accept="image/*" onchange="updateFotoProfil(this)">
+                        </label>
+                    </div>
+                    <h3 id="profile-nama" class="font-bold text-lg text-slate-800 mt-4">-</h3>
+                    <p id="profile-jabatan" class="text-xs font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full mt-1">-</p>
+                    
+                    <div class="w-full border-t border-slate-100 my-4 pt-4 text-left space-y-2.5 text-sm">
+                        <div><span class="text-xs text-slate-400 block">NIP / NIKKI</span><p id="profile-nip" class="font-medium text-slate-700">-</p></div>
+                        <div><span class="text-xs text-slate-400 block">NRK</span><p id="profile-nrk" class="font-medium text-slate-700">-</p></div>
+                        <div><span class="text-xs text-slate-400 block">Pangkat / Golongan</span><p id="profile-pangkat" class="font-medium text-slate-700">-</p></div>
+                        <div><span class="text-xs text-slate-400 block">Tempat, Tanggal Lahir</span><p id="profile-ttl" class="font-medium text-slate-700">-</p></div>
+                    </div>
+
+                    <div id="nav-menu-list" class="w-full space-y-1 pt-4 border-t border-slate-100">
+                        <button onclick="switchMenu('pribadi')" id="btn-m-pribadi" class="menu-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm transition-all text-slate-600 hover:bg-slate-50"><i class="fa fa-user w-5 text-center"></i> Arsip Pribadi</button>
+                        <button onclick="switchMenu('kepegawaian')" id="btn-m-kepegawaian" class="menu-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm transition-all text-slate-600 hover:bg-slate-50"><i class="fa fa-file-invoice w-5 text-center"></i> Arsip Kepegawaian</button>
+                        <button onclick="switchMenu('lainnya')" id="btn-m-lainnya" class="menu-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm transition-all text-slate-600 hover:bg-slate-50"><i class="fa fa-folder-open w-5 text-center"></i> Arsip Lainnya</button>
+                        <button onclick="switchMenu('password')" id="btn-m-password" class="menu-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm transition-all text-slate-600 hover:bg-slate-50 text-slate-600"><i class="fa fa-key w-5 text-center"></i> Ganti Password</button>
+                        <button onclick="switchMenu('admin')" id="btn-m-admin" class="menu-btn w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm transition-all text-slate-600 hover:bg-slate-50 hidden bg-amber-50 text-amber-700"><i class="fa fa-user-shield w-5 text-center"></i> Panel Administrator</button>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-3 space-y-6">
+                    <div id="panel-arsip" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hidden">
+                        <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                            <h2 id="panel-title" class="font-bold text-lg text-slate-800 capitalize">Arsip Dokumen</h2>
+                            <span id="panel-count" class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-semibold">0 Dokumen</span>
+                        </div>
+                        <div class="overflow-x-auto w-full">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50/70 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase">
+                                        <th class="p-3.5 text-center w-12">No</th>
+                                        <th class="p-3.5">Nama Dokumen / Berkas</th>
+                                        <th class="p-3.5">Tanggal Upload</th>
+                                        <th class="p-3.5">Ukuran</th>
+                                        <th class="p-3.5 text-center w-24">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-arsip-tbody" class="text-sm text-slate-600 divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="panel-password" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hidden">
+                        <h2 class="font-bold text-lg text-slate-800 mb-4"><i class="fa fa-key text-blue-500 mr-2"></i>Keamanan & Ganti Password</h2>
+                        <div class="max-w-md space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-500 mb-1">Password Lama Anda</label>
+                                <input type="password" id="pwd-lama" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-500 mb-1">Password Baru</label>
+                                <input type="password" id="pwd-baru" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-500 mb-1">Konfirmasi Password Baru</label>
+                                <input type="password" id="pwd-konfirmasi" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                            </div>
+                            <button id="btn-ganti-password" onclick="prosesGantiPassword()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-lg text-sm transition-all shadow shadow-blue-200">Perbarui Password</button>
+                        </div>
+                    </div>
+
+                    <div id="panel-admin" class="space-y-6 hidden">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                            <h2 class="font-bold text-lg text-slate-800 mb-4"><i class="fa fa-upload text-amber-500 mr-2"></i>Upload Berkas Pegawai</h2>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500 mb-1">Username / NIP Sasaran</label>
+                                    <input type="text" id="admin-target-user" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm" placeholder="Contoh: 147648">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500 mb-1">Kategori Dokumen</label>
+                                    <select id="admin-kategori" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm">
+                                        <option value="pribadi">Arsip Pribadi</option>
+                                        <option value="kepegawaian">Arsip Kepegawaian</option>
+                                        <option value="lainnya">Arsip Lainnya</option>
+                                    </select>
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs font-medium text-slate-500 mb-1">Nama Judul Berkas</label>
+                                    <input type="text" id="admin-nama-berkas" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm" placeholder="Contoh: SK Kenaikan Pangkat 2026">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs font-medium text-slate-500 mb-1">Pilih Dokumen (PDF/Gambar)</label>
+                                    <input type="file" id="admin-file" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                </div>
+                            </div>
+                            <button id="btn-admin-upload" onclick="prosesUploadAdmin()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-lg text-sm transition-all shadow shadow-blue-200">Kirim & Simpan Berkas</button>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <h2 class="font-bold text-lg text-slate-800"><i class="fa fa-folder-tree text-blue-500 mr-2"></i>Manajemen & Monitoring Arsip</h2>
+                                <div class="flex gap-2">
+                                    <input type="text" id="admin-search-user" class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs" placeholder="Masukkan NIP Pegawai...">
+                                    <button onclick="loadAdminMonitoring()" class="bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-slate-900"><i class="fa fa-search"></i> Cari</button>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto w-full">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase">
+                                            <th class="p-3 text-center w-12">No</th>
+                                            <th class="p-3">Nama Berkas</th>
+                                            <th class="p-3">Kategori</th>
+                                            <th class="p-3">Tanggal</th>
+                                            <th class="p-3 text-center w-32">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-monitoring-tbody" class="text-sm text-slate-600 divide-y divide-slate-100">
+                                        <tr><td colspan="5" class="p-4 text-center text-slate-400">Masukkan NIP pegawai untuk memantau data berkas.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-slate-100 text-center py-4 text-xs text-slate-400">
+        &copy; 2026 Tata Usaha Kepegawaian - SMPN 156 Jakarta.
+    </footer>
+
+    <script>
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz8SNr57fL9xeOpzazfUnjotj9Q4Ii3OW5Nw5Xl63UU7L1BHsXJoqIO7AUibTi7kvk7/exec";
+        
+        let loggedInUser = "";
+        let currentRole = "";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('sekarsa_username');
+            const savedRole = localStorage.getItem('sekarsa_role');
+            if(savedUser && savedRole) {
+                loggedInUser = savedUser;
+                currentRole = savedRole;
+                masukDashboard();
+            }
+        });
+
+        // FUNGSI DIALOG CUSTOM UNTUK TAMPILAN PREMIUM
+        function tampilkanDialog(status, judul, pesan, durasi = 2000) {
+            const dialog = document.getElementById('custom-dialog');
+            const iconBg = document.getElementById('dialog-icon-container');
+            const icon = document.getElementById('dialog-icon');
+            const title = document.getElementById('dialog-title');
+            const message = document.getElementById('dialog-message');
+
+            title.innerText = judul;
+            message.innerText = pesan;
+
+            if (status === 'sukses') {
+                iconBg.className = "w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl bg-emerald-50 text-emerald-500";
+                icon.className = "fa-solid fa-circle-check";
+            } else if (status === 'keluar') {
+                iconBg.className = "w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl bg-slate-100 text-slate-500";
+                icon.className = "fa-solid fa-right-from-bracket";
+            } else {
+                iconBg.className = "w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl bg-rose-50 text-rose-500";
+                icon.className = "fa-solid fa-circle-xmark";
+            }
+
+            dialog.classList.remove('hidden');
+            setTimeout(() => {
+                dialog.classList.remove('opacity-0');
+                dialog.firstElementChild.classList.remove('scale-95');
+            }, 10);
+
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    dialog.classList.add('opacity-0');
+                    dialog.firstElementChild.classList.add('scale-95');
+                    setTimeout(() => {
+                        dialog.classList.add('hidden');
+                        resolve();
+                    }, 300);
+                }, durasi);
+            });
+        }
+
+        function masukDashboard() {
+            document.getElementById('page-login').classList.add('hidden');
+            document.getElementById('main-header').classList.remove('hidden');
+            document.getElementById('dashboard-container').classList.remove('hidden');
+            document.getElementById('nav-role-user').innerText = currentRole;
+            
+            if(currentRole === "admin") {
+                document.getElementById('btn-m-admin').classList.remove('hidden');
+            } else {
+                document.getElementById('btn-m-admin').classList.add('hidden');
+            }
+
+            const cachedFoto = localStorage.getItem('sekarsa_foto_' + loggedInUser);
+            if(cachedFoto && cachedFoto.startsWith("data:image")) {
+                document.getElementById('profile-img').src = cachedFoto;
+                document.getElementById('nav-profile-img').src = cachedFoto;
+            } else {
+                document.getElementById('profile-img').src = "https://via.placeholder.com/150";
+                document.getElementById('nav-profile-img').src = "https://via.placeholder.com/40";
+            }
+
+            loadProfil();
+            switchMenu(currentRole === "admin" ? 'admin' : 'pribadi');
+        }
+
+        function login() {
+            const user = document.getElementById('login-username').value.trim();
+            const pass = document.getElementById('login-password').value.trim();
+            const btn = document.getElementById('btn-login');
+
+            if(!user || !pass) return tampilkanDialog('gagal', 'Gagal', 'Lengkapi form login terlebih dahulu.');
+            btn.innerText = "Memverifikasi...";
+            btn.disabled = true;
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "login", username: user, password: pass })
+            })
+            .then(res => res.json())
+            .then(async (res) => {
+                if(res.status === "Sukses") {
+                    loggedInUser = user;
+                    currentRole = res.role;
+                    localStorage.setItem('sekarsa_username', loggedInUser);
+                    localStorage.setItem('sekarsa_role', currentRole);
+                    
+                    // Trigger dialog sukses login
+                    await tampilkanDialog('sukses', 'Login Berhasil', `Selamat datang kembali, ${res.nama}!`);
+                    masukDashboard();
+                } else {
+                    tampilkanDialog('gagal', 'Login Gagal', res.message);
+                }
+            })
+            .catch(() => tampilkanDialog('gagal', 'Gangguan Koneksi', 'Gagal terhubung dengan server.'))
+            .finally(() => {
+                btn.innerText = "Masuk Ke Sistem";
+                btn.disabled = false;
+            });
+        }
+
+        function loadProfil() {
+            if (!loggedInUser) return;
+            fetch(`${WEB_APP_URL}?menu=profil&user=${loggedInUser}`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('profile-nama').innerText = data.nama || '-';
+                document.getElementById('nav-nama-user').innerText = data.nama || '-';
+                document.getElementById('profile-nip').innerText = data.nip_nikki || '-';
+                document.getElementById('profile-nrk').innerText = data.nrk || '-';
+                document.getElementById('profile-jabatan').innerText = data.jabatan || '-';
+                document.getElementById('profile-pangkat').innerText = data.pangkat_gol || '-';
+                document.getElementById('profile-ttl').innerText = data.ttl || '-';
+                
+                if (data.foto && data.foto.startsWith("data:image")) {
+                    document.getElementById('profile-img').src = data.foto;
+                    document.getElementById('nav-profile-img').src = data.foto;
+                    localStorage.setItem('sekarsa_foto_' + loggedInUser, data.foto);
+                }
+            })
+            .catch(err => console.error("Gagal sinkronisasi profil:", err));
+        }
+
+        function updateFotoProfil(fileInput) {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const MAX_WIDTH = 300;
+                    const MAX_HEIGHT = 300;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = MAX_HEIGHT;
+                    ctx.drawImage(img, 0, 0, MAX_WIDTH, MAX_HEIGHT);
+                    
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    document.getElementById('profile-img').src = compressedBase64;
+                    document.getElementById('nav-profile-img').src = compressedBase64;
+
+                    fetch(WEB_APP_URL, {
+                        method: "POST",
+                        body: JSON.stringify({ action: "update_foto", username: loggedInUser, fotoData: compressedBase64 })
+                    })
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res.status === "Sukses") {
+                            alert("Foto profil berhasil terpasang selamanya di akun Anda!");
+                            localStorage.setItem('sekarsa_foto_' + loggedInUser, compressedBase64);
+                            loadProfil(); 
+                        } else { alert("Gagal: " + res.message); }
+                    })
+                    .catch(() => alert("Koneksi bermasalah saat mengirim pembaruan foto."));
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function switchMenu(menu) {
+            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('bg-blue-600', 'text-white'));
+            document.getElementById('panel-arsip').classList.add('hidden');
+            document.getElementById('panel-admin').classList.add('hidden');
+            document.getElementById('panel-password').classList.add('hidden');
+
+            if(menu === 'admin') {
+                document.getElementById('btn-m-admin').classList.add('bg-blue-600', 'text-white');
+                document.getElementById('panel-admin').classList.remove('hidden');
+            } else if(menu === 'password') {
+                document.getElementById('btn-m-password').classList.add('bg-blue-600', 'text-white');
+                document.getElementById('panel-password').classList.remove('hidden');
+                // Reset fields
+                document.getElementById('pwd-lama').value = "";
+                document.getElementById('pwd-baru').value = "";
+                document.getElementById('pwd-konfirmasi').value = "";
+            } else {
+                document.getElementById('btn-m-' + menu).classList.add('bg-blue-600', 'text-white');
+                document.getElementById('panel-arsip').classList.remove('hidden');
+                loadDataArsip(menu);
+            }
+        }
+
+        // FUNGSI PROSES GANTI PASSWORD MANDIRI
+        function prosesGantiPassword() {
+            const pwdLama = document.getElementById('pwd-lama').value.trim();
+            const pwdBaru = document.getElementById('pwd-baru').value.trim();
+            const pwdKonf = document.getElementById('pwd-konfirmasi').value.trim();
+            const btn = document.getElementById('btn-ganti-password');
+
+            if(!pwdLama || !pwdBaru || !pwdKonf) return tampilkanDialog('gagal', 'Data Tidak Lengkap', 'Semua kolom password wajib diisi.');
+            if(pwdBaru !== pwdKonf) return tampilkanDialog('gagal', 'Tidak Sesuai', 'Konfirmasi password baru tidak cocok.');
+            if(pwdBaru.length < 4) return tampilkanDialog('gagal', 'Terlalu Pendek', 'Password minimal terdiri dari 4 karakter.');
+
+            btn.innerText = "Memproses...";
+            btn.disabled = true;
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "ganti_password_user",
+                    username: loggedInUser,
+                    passwordLama: pwdLama,
+                    passwordBaru: pwdBaru
+                })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.status === "Sukses") {
+                    tampilkanDialog('sukses', 'Berhasil', res.message);
+                    switchMenu('pribadi');
+                } else {
+                    tampilkanDialog('gagal', 'Gagal', res.message);
+                }
+            })
+            .catch(() => tampilkanDialog('gagal', 'Error', 'Gagal mengubah password.'))
+            .finally(() => {
+                btn.innerText = "Perbarui Password";
+                btn.disabled = false;
+            });
+        }
+
+        function loadDataArsip(kategori) {
+            const tbody = document.getElementById('table-arsip-tbody');
+            document.getElementById('panel-title').innerText = "Arsip " + kategori;
+            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center">Memuat dokumen...</td></tr>`;
+
+            fetch(`${WEB_APP_URL}?menu=${kategori}&user=${loggedInUser}`)
+            .then(res => res.json())
+            .then(data => {
+                tbody.innerHTML = "";
+                document.getElementById('panel-count').innerText = `${data.length} Dokumen`;
+                if(data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Belum ada dokumen.</td></tr>`;
+                    return;
+                }
+                data.forEach((item, index) => {
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-3.5 text-center font-medium text-slate-400">${index+1}</td>
+                            <td class="p-3.5 font-semibold text-slate-700">${item.nama}</td>
+                            <td class="p-3.5 text-xs text-slate-400">${item.tanggal || '-'}</td>
+                            <td class="p-3.5 text-xs text-slate-500">${item.ukuran || '-'}</td>
+                            <td class="p-3.5 text-center">
+                                <a href="${item.linkDrive}" target="_blank" class="bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-xl text-xs font-medium transition-all inline-block"><i class="fa fa-eye mr-1"></i> Lihat</a>
+                            </td>
+                        </tr>
+                    `;
+                });
+            })
+            .catch(() => { tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-500">Gagal memuat dokumen.</td></tr>`; });
+        }
+
+        function prosesUploadAdmin() {
+            const targetUser = document.getElementById('admin-target-user').value.trim();
+            const kategori = document.getElementById('admin-kategori').value;
+            const namaBerkas = document.getElementById('admin-nama-berkas').value.trim();
+            const fileInput = document.getElementById('admin-file');
+            const btn = document.getElementById('btn-admin-upload');
+
+            if(!targetUser || !namaBerkas || !fileInput.files[0]) return alert("Lengkapi data formulir berkas!");
+            btn.innerText = "Mengunggah Berkas...";
+            btn.disabled = true;
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                fetch(WEB_APP_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "admin_upload",
+                        targetUser: targetUser,
+                        kategori: kategori,
+                        namaBerkas: namaBerkas,
+                        fileData: event.target.result,
+                        fileName: file.name
+                    })
+                })
+                .then(res => res.json())
+                .then(res => {
+                    alert(res.message);
+                    if(res.status === "Sukses") {
+                        document.getElementById('admin-nama-berkas').value = "";
+                        fileInput.value = "";
+                        loadAdminMonitoring(); 
+                    }
+                })
+                .catch(() => alert("Gagal mengunggah berkas."))
+                .finally(() => {
+                    btn.innerText = "Kirim & Simpan Berkas";
+                    btn.disabled = false;
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function loadAdminMonitoring() {
+            const targetUser = document.getElementById('admin-search-user').value.trim();
+            if (!targetUser) return alert("Ketikkan NIP sasaran.");
+            const tbody = document.getElementById('admin-monitoring-tbody');
+            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center">Memuat arsip...</td></tr>`;
+
+            fetch(`${WEB_APP_URL}?menu=admin_monitoring&targetUser=${targetUser}`)
+            .then(res => res.json())
+            .then(data => {
+                tbody.innerHTML = "";
+                if (data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Pegawai belum memiliki dokumen.</td></tr>`;
+                    return;
+                }
+                data.forEach((item, index) => {
+                    const safeItem = encodeURIComponent(JSON.stringify(item));
+                    tbody.innerHTML += `
+                        <tr class="border-b hover:bg-slate-50">
+                            <td class="p-3 text-center">${index + 1}</td>
+                            <td class="p-3 font-semibold text-slate-700">${item.nama}</td>
+                            <td class="p-3"><span class="px-2 py-0.5 text-xs rounded-full bg-slate-100 text-slate-700 capitalize font-medium">${item.kategori}</span></td>
+                            <td class="p-3 text-xs text-slate-400">${item.tanggal || '-'}</td>
+                            <td class="p-3 text-center flex justify-center gap-1.5">
+                                <a href="${item.linkDrive}" target="_blank" class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-2 py-1 rounded-md text-xs hover:bg-emerald-600 hover:text-white"><i class="fa fa-eye"></i></a>
+                                <button onclick="bukaModalEdit('${safeItem}', '${targetUser}')" class="bg-amber-50 text-amber-600 border border-amber-100 px-2 py-1 rounded-md text-xs hover:bg-amber-600 hover:text-white"><i class="fa fa-edit"></i></button>
+                                <button onclick="hapusBerkasAdmin('${item.nama}', '${item.kategori}', '${item.linkDrive}', '${targetUser}')" class="bg-rose-50 text-rose-600 border border-rose-100 px-2 py-1 rounded-md text-xs hover:bg-rose-600 hover:text-white"><i class="fa fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            })
+            .catch(() => { tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-500">Error memuat monitor.</td></tr>`; });
+        }
+
+        function bukaModalEdit(encodedItem, targetUser) {
+            const item = JSON.parse(decodeURIComponent(encodedItem));
+            const namaBaru = prompt("Ubah Nama Berkas:", item.nama);
+            if (namaBaru === null || namaBaru.trim() === "") return;
+            const kategoriBaru = prompt("Ubah Kategori (pribadi / kepegawaian / lainnya):", item.kategori);
+            if (kategoriBaru === null) return;
+            const katText = kategoriBaru.toLowerCase().trim();
+
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "admin_edit_berkas", targetUser: targetUser, namaLama: item.nama, kategoriLama: item.kategori, namaBaru: namaBaru.trim(), kategoriBaru: katText })
+            })
+            .then(res => res.json()).then(res => { alert(res.message); loadAdminMonitoring(); });
+        }
+
+        function deleteFileDriveAndRow(item, targetUser) {}
+
+        function hapusBerkasAdmin(namaBerkas, kategori, linkDrive, targetUser) {
+            if (!confirm(`Hapus berkas "${namaBerkas}"?`)) return;
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "admin_hapus_berkas", targetUser: targetUser, namaBerkas: namaBerkas, kategori: kategori, linkDrive: linkDrive })
+            })
+            .then(res => res.json()).then(res => { alert(res.message); loadAdminMonitoring(); });
+        }
+
+        function lupaPassword() {
+            const user = prompt("Masukkan Username / NIP Anda:");
+            if(!user) return;
+            fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({ action: "lupa_password", username: user }) })
+            .then(res => res.json()).then(res => alert(res.message));
+        }
+
+        // TRIGGER LOGOUT DENGAN KONFIRMASI DIALOG ELEGAN
+        async function logoutKonfirmasi() {
+            if(!confirm("Apakah Anda yakin ingin keluar dari sistem?")) return;
+            await tampilkanDialog('keluar', 'Sesi Berakhir', 'Anda telah berhasil keluar dari sistem.');
+            logout();
+        }
+
+        function logout() {
+            localStorage.removeItem('sekarsa_username');
+            localStorage.removeItem('sekarsa_role');
+            loggedInUser = ""; currentRole = "";
+            document.getElementById('login-username').value = "";
+            document.getElementById('login-password').value = "";
+            document.getElementById('dashboard-container').classList.add('hidden');
+            document.getElementById('main-header').classList.add('hidden');
+            document.getElementById('page-login').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
