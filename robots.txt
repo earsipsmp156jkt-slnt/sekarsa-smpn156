@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://earsipsmp156jkt-slnt.github.io/sekarsa-smpn156/sitemap.xml
