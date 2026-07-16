@@ -54,7 +54,7 @@
             </div>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1 uppercase tracking-wider">Username / NIP</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1 uppercase tracking-wider">Username / NRK</label>
                     <input type="text" id="login-username" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan username">
                 </div>
                 <div>
@@ -144,7 +144,7 @@
                             <h2 class="font-bold text-lg text-slate-800 mb-4"><i class="fa fa-upload text-amber-500 mr-2"></i>Upload Berkas Pegawai</h2>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-xs font-medium text-slate-500 mb-1">Username / NIP Sasaran</label>
+                                    <label class="block text-xs font-medium text-slate-500 mb-1">Username / NRK Sasaran</label>
                                     <input type="text" id="admin-target-user" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm" placeholder="Contoh: 147648">
                                 </div>
                                 <div>
@@ -171,7 +171,7 @@
                             <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                 <h2 class="font-bold text-lg text-slate-800"><i class="fa fa-folder-tree text-blue-500 mr-2"></i>Manajemen & Monitoring Arsip</h2>
                                 <div class="flex gap-2">
-                                    <input type="text" id="admin-search-user" class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs" placeholder="Masukkan NIP Pegawai...">
+                                    <input type="text" id="admin-search-user" class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs" placeholder="Masukkan NRK Pegawai...">
                                     <button onclick="loadAdminMonitoring()" class="bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-slate-900"><i class="fa fa-search"></i> Cari</button>
                                 </div>
                             </div>
@@ -187,7 +187,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="admin-monitoring-tbody" class="text-sm text-slate-600 divide-y divide-slate-100">
-                                        <tr><td colspan="5" class="p-4 text-center text-slate-400">Masukkan NIP pegawai untuk memantau data berkas.</td></tr>
+                                        <tr><td colspan="5" class="p-4 text-center text-slate-400">Masukkan NRK pegawai untuk memantau data berkas.</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -518,7 +518,7 @@
 
         function loadAdminMonitoring() {
             const targetUser = document.getElementById('admin-search-user').value.trim();
-            if (!targetUser) return alert("Ketikkan NIP sasaran.");
+            if (!targetUser) return alert("Ketikkan NRK sasaran.");
             const tbody = document.getElementById('admin-monitoring-tbody');
             tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center">Memuat arsip...</td></tr>`;
 
@@ -577,7 +577,7 @@
         }
 
         function lupaPassword() {
-            const user = prompt("Masukkan Username / NIP Anda:");
+            const user = prompt("Masukkan Username / NRK Anda:");
             if(!user) return;
             fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({ action: "lupa_password", username: user }) })
             .then(res => res.json()).then(res => alert(res.message));
