@@ -15,6 +15,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
+    <!-- DIALOG NOTIFIKASI UMUM -->
     <div id="custom-dialog" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-2xl shadow-xl border border-slate-100 max-w-sm w-full p-6 text-center transform scale-95 transition-transform duration-300">
             <div id="dialog-icon-container" class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl">
@@ -25,6 +26,22 @@
         </div>
     </div>
 
+    <!-- DIALOG KONFIRMASI LOGOUT (TAMPIL DI TENGAH) -->
+    <div id="logout-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 max-w-sm w-full p-6 text-center transform scale-95 transition-transform duration-300">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl bg-amber-50 text-amber-500">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900">Konfirmasi Keluar</h3>
+            <p class="text-sm text-slate-500 mt-2">Apakah Anda yakin ingin keluar dari sistem?</p>
+            <div class="flex gap-3 mt-6">
+                <button onclick="tutupModalLogout()" class="w-1/2 py-2.5 rounded-xl border border-slate-200 font-medium text-slate-600 hover:bg-slate-50 transition-all text-sm">Batal</button>
+                <button onclick="eksekusiLogout()" class="w-1/2 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 font-medium text-white shadow-lg transition-all text-sm">Ya, Keluar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER SYSTEM -->
     <header id="main-header" class="bg-white shadow-sm border-b border-slate-200 hidden sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -40,34 +57,41 @@
                     <p id="nav-role-user" class="text-xs text-slate-400 capitalize">-</p>
                 </div>
                 <img id="nav-profile-img" src="https://via.placeholder.com/40" alt="Avatar" class="h-10 w-10 rounded-full object-cover border border-slate-200">
-                <button onclick="logoutKonfirmasi()" class="text-slate-400 hover:text-rose-600 transition-colors p-2" title="Keluar"><i class="fa-solid fa-right-from-bracket text-xl"></i></button>
+                <button onclick="bukaModalLogout()" class="text-slate-400 hover:text-rose-600 transition-colors p-2" title="Keluar"><i class="fa-solid fa-right-from-bracket text-xl"></i></button>
             </div>
         </div>
     </header>
 
     <main class="flex-grow flex items-center justify-center p-4">
+        <!-- FORM LOGIN -->
         <div id="page-login" class="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 w-full max-w-md transition-all">
             <div class="text-center mb-6">
                 <img src="logo.png" alt="Logo" class="h-20 w-20 mx-auto mb-3" onerror="this.src='https://via.placeholder.com/80'">
                 <h2 class="text-2xl font-bold text-slate-900">Selamat Datang</h2>
                 <p class="text-sm text-slate-500 mt-1">E-Arsip Kepegawaian SMPN 156 Jakarta</p>
             </div>
-            <div class="space-y-4">
+            <form onsubmit="event.preventDefault(); login();" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1 uppercase tracking-wider">Username / NRK</label>
                     <input type="text" id="login-username" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan username">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1 uppercase tracking-wider">Password</label>
-                    <input type="password" id="login-password" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                    <div class="relative">
+                        <input type="password" id="login-password" class="w-full px-4 py-2.5 pr-11 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 focus:outline-none" title="Lihat/Sembunyikan Sandi">
+                            <i id="toggle-password-icon" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
-                <button id="btn-login" onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl shadow-lg transition-all mt-2">Masuk Ke Sistem</button>
+                <button type="submit" id="btn-login" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl shadow-lg transition-all mt-2">Masuk Ke Sistem</button>
                 <div class="text-center mt-3">
-                    <button onclick="lupaPassword()" class="text-xs text-blue-500 hover:underline">Lupa Password Anda?</button>
+                    <button type="button" onclick="lupaPassword()" class="text-xs text-blue-500 hover:underline">Lupa Password Anda?</button>
                 </div>
-            </div>
+            </form>
         </div>
 
+        <!-- DASHBOARD BOARD -->
         <div id="dashboard-container" class="w-full max-w-7xl mx-auto hidden transition-all">
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
                 
@@ -204,7 +228,7 @@
     </footer>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz8SNr57fL9xeOpzazfUnjotj9Q4Ii3OW5Nw5Xl63UU7L1BHsXJoqIO7AUibTi7kvk7/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwiMCvALHz6VgX0hjHboF4Nlsc4sjn5YKfnmNXXnN5ncoyXT8IQVUKVXKcfSuZ9Xewe/exec";
         
         let loggedInUser = "";
         let currentRole = "";
@@ -219,7 +243,23 @@
             }
         });
 
-        // FUNGSI DIALOG CUSTOM UNTUK TAMPILAN PREMIUM
+        // Toggle Lihat Sandi
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('login-password');
+            const icon = document.getElementById('toggle-password-icon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Dialog Notifikasi Umum
         function tampilkanDialog(status, judul, pesan, durasi = 2000) {
             const dialog = document.getElementById('custom-dialog');
             const iconBg = document.getElementById('dialog-icon-container');
@@ -257,6 +297,31 @@
                     }, 300);
                 }, durasi);
             });
+        }
+
+        // Modal Logout di Tengah
+        function bukaModalLogout() {
+            const modal = document.getElementById('logout-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.firstElementChild.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function tutupModalLogout() {
+            const modal = document.getElementById('logout-modal');
+            modal.classList.add('opacity-0');
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        async function eksekusiLogout() {
+            tutupModalLogout();
+            await tampilkanDialog('keluar', 'Sesi Berakhir', 'Anda telah berhasil keluar dari sistem.');
+            logout();
         }
 
         function masukDashboard() {
@@ -305,7 +370,6 @@
                     localStorage.setItem('sekarsa_username', loggedInUser);
                     localStorage.setItem('sekarsa_role', currentRole);
                     
-                    // Trigger dialog sukses login
                     await tampilkanDialog('sukses', 'Login Berhasil', `Selamat datang kembali, ${res.nama}!`);
                     masukDashboard();
                 } else {
@@ -368,12 +432,12 @@
                     .then(res => res.json())
                     .then(res => {
                         if (res.status === "Sukses") {
-                            alert("Foto profil berhasil terpasang selamanya di akun Anda!");
+                            tampilkanDialog('sukses', 'Berhasil', 'Foto profil berhasil tersimpan di akun Anda!');
                             localStorage.setItem('sekarsa_foto_' + loggedInUser, compressedBase64);
                             loadProfil(); 
-                        } else { alert("Gagal: " + res.message); }
+                        } else { tampilkanDialog('gagal', 'Gagal Update', res.message); }
                     })
-                    .catch(() => alert("Koneksi bermasalah saat mengirim pembaruan foto."));
+                    .catch(() => tampilkanDialog('gagal', 'Gangguan Koneksi', 'Gagal mengirim pembaruan foto.'));
                 };
                 img.src = e.target.result;
             };
@@ -392,7 +456,6 @@
             } else if(menu === 'password') {
                 document.getElementById('btn-m-password').classList.add('bg-blue-600', 'text-white');
                 document.getElementById('panel-password').classList.remove('hidden');
-                // Reset fields
                 document.getElementById('pwd-lama').value = "";
                 document.getElementById('pwd-baru').value = "";
                 document.getElementById('pwd-konfirmasi').value = "";
@@ -403,7 +466,6 @@
             }
         }
 
-        // FUNGSI PROSES GANTI PASSWORD MANDIRI
         function prosesGantiPassword() {
             const pwdLama = document.getElementById('pwd-lama').value.trim();
             const pwdBaru = document.getElementById('pwd-baru').value.trim();
@@ -480,7 +542,7 @@
             const fileInput = document.getElementById('admin-file');
             const btn = document.getElementById('btn-admin-upload');
 
-            if(!targetUser || !namaBerkas || !fileInput.files[0]) return alert("Lengkapi data formulir berkas!");
+            if(!targetUser || !namaBerkas || !fileInput.files[0]) return tampilkanDialog('gagal', 'Form Belum Lengkap', 'Lengkapi seluruh data formulir berkas.');
             btn.innerText = "Mengunggah Berkas...";
             btn.disabled = true;
 
@@ -500,14 +562,16 @@
                 })
                 .then(res => res.json())
                 .then(res => {
-                    alert(res.message);
                     if(res.status === "Sukses") {
+                        tampilkanDialog('sukses', 'Berhasil', res.message);
                         document.getElementById('admin-nama-berkas').value = "";
                         fileInput.value = "";
                         loadAdminMonitoring(); 
+                    } else {
+                        tampilkanDialog('gagal', 'Gagal Upload', res.message);
                     }
                 })
-                .catch(() => alert("Gagal mengunggah berkas."))
+                .catch(() => tampilkanDialog('gagal', 'Gagal Upload', 'Terjadi kesalahan sistem saat mengunggah.'))
                 .finally(() => {
                     btn.innerText = "Kirim & Simpan Berkas";
                     btn.disabled = false;
@@ -518,7 +582,7 @@
 
         function loadAdminMonitoring() {
             const targetUser = document.getElementById('admin-search-user').value.trim();
-            if (!targetUser) return alert("Ketikkan NRK sasaran.");
+            if (!targetUser) return tampilkanDialog('gagal', 'Form Kosong', 'Ketikkan NRK sasaran terlebih dahulu.');
             const tbody = document.getElementById('admin-monitoring-tbody');
             tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center">Memuat arsip...</td></tr>`;
 
@@ -562,10 +626,12 @@
                 method: "POST",
                 body: JSON.stringify({ action: "admin_edit_berkas", targetUser: targetUser, namaLama: item.nama, kategoriLama: item.kategori, namaBaru: namaBaru.trim(), kategoriBaru: katText })
             })
-            .then(res => res.json()).then(res => { alert(res.message); loadAdminMonitoring(); });
+            .then(res => res.json())
+            .then(res => { 
+                tampilkanDialog(res.status === "Sukses" ? 'sukses' : 'gagal', 'Status Edit', res.message); 
+                loadAdminMonitoring(); 
+            });
         }
-
-        function deleteFileDriveAndRow(item, targetUser) {}
 
         function hapusBerkasAdmin(namaBerkas, kategori, linkDrive, targetUser) {
             if (!confirm(`Hapus berkas "${namaBerkas}"?`)) return;
@@ -573,21 +639,19 @@
                 method: "POST",
                 body: JSON.stringify({ action: "admin_hapus_berkas", targetUser: targetUser, namaBerkas: namaBerkas, kategori: kategori, linkDrive: linkDrive })
             })
-            .then(res => res.json()).then(res => { alert(res.message); loadAdminMonitoring(); });
+            .then(res => res.json())
+            .then(res => { 
+                tampilkanDialog(res.status === "Sukses" ? 'sukses' : 'gagal', 'Status Hapus', res.message); 
+                loadAdminMonitoring(); 
+            });
         }
 
         function lupaPassword() {
             const user = prompt("Masukkan Username / NRK Anda:");
             if(!user) return;
             fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({ action: "lupa_password", username: user }) })
-            .then(res => res.json()).then(res => alert(res.message));
-        }
-
-        // TRIGGER LOGOUT DENGAN KONFIRMASI DIALOG ELEGAN
-        async function logoutKonfirmasi() {
-            if(!confirm("Apakah Anda yakin ingin keluar dari sistem?")) return;
-            await tampilkanDialog('keluar', 'Sesi Berakhir', 'Anda telah berhasil keluar dari sistem.');
-            logout();
+            .then(res => res.json())
+            .then(res => tampilkanDialog(res.status === "Sukses" ? 'sukses' : 'gagal', 'Reset Password', res.message));
         }
 
         function logout() {
